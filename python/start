@@ -6,8 +6,8 @@ DIR="$(cd -P "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo -n 'Starting remote gunicorn app... '
 
-$DIR/remote "cd app && \
-            gunicorn --daemon -w 1 app:app -b :3000 \
+"./remote" "cd app && \
+            gunicorn --daemon -w 1 app:app --name server -b :3000 \
                 --statsd-host localhost:8125 \
                 --error-logfile ../gunicorn.err > ../gunicorn.out"
 
