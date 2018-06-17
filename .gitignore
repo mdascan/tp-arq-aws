@@ -9,9 +9,16 @@
 # Node
 node_modules/
 
+# Terraform
+terraform
+
 # Local files
 terraform.tfvars
 ip
 elb_dns
-src.zip
+*zip
 key.pem
+variables.tf
+redis_dns
+aws_access
+aws_secret
