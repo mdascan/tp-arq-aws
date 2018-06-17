@@ -1,8 +1,11 @@
+/*jshint esversion: 6 */
+
 // Import libraries
 const express     = require('express');
 const got         = require('got');
 const redis       = require('redis');
 const {promisify} = require('util');
+const lambda      = require('aws-lambda-invoke');
 
 // Load config
 const config   = require('./config');
@@ -18,6 +21,7 @@ config.redis.retryStrategy = (options) => {
   }
   console.log('Got another error when starting redis:', options.error);
 };
+
 const redisClient = redis.createClient(config.redis);
 for (let method of ['set', 'get', 'del']) {
   redisClient[method] = promisify(redisClient[method]);
@@ -36,6 +40,7 @@ app.use(connectDatadog);
 app.get('/', (req, res) => res.send('Hello World!'));
 app.get('/remote', getRemote);
 app.get('/remote/cached', getCached);
+app.get('/lambda', getLambda);
 app.delete('/remote/cached', delCached);
 
 // Start app
@@ -67,6 +72,21 @@ async function getCached(req, res) {
 
   debug(reqId, 'answering');
   res.send(value);
+}
+
+async function getLambda(req, res) {
+  let remoteUrl = new url.URL(`${config.remoteBaseUri}/sleep/1`);
+
+  try {
+    const result = await lambda.invoke('remoteService', {
+      "options": {},
+      "data": ""
+    });
+
+    res.send(result);
+  } catch (error) {
+    res.status(500).send(error);
+  }
 }
 
 
