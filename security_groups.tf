@@ -49,3 +49,25 @@ resource "aws_security_group" "elb" {
     security_groups = ["${aws_security_group.apps.id}"]
   }
 }
+
+resource "aws_security_group" "redis" {
+  name        = "Main SG for Redis"
+  description = "Allow incoming traffic on listening port"
+  vpc_id      = "${var.vpc_id}"
+
+  ingress {
+    description = "Traffic"
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    security_groups = ["${aws_security_group.apps.id}"]
+  }
+
+  egress {
+    description = "Allow all outgoing traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    security_groups = ["${aws_security_group.apps.id}"]
+  }
+}
